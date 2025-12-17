@@ -6,26 +6,15 @@ import cv2
 from sklearn.cluster import KMeans
 import os
 
-# ==========================================
-# 1. MODEL LOADING & CONFIGURATION
-# ==========================================
-
-# IMPORTANT: The order here must match EXACTLY the alphabetical order 
-# of folders in your training data, unless you defined a specific order.
-# usually ImageFolder uses alphabetical: ['DRESS', 'JEANS', 'SKIRT', 'T-SHIRT']
-# If you are sure it is the order you pasted:
 CLASSES = ['JEANS', 'T-SHIRT', 'DRESS', 'SKIRT']
 
-# MAP: Model Output -> App Category (top/bottom/shoe)
-# The recommender needs 'top', 'bottom', 'shoe' to work.
 CATEGORY_MAP = {
     'JEANS': 'bottom',
     'SKIRT': 'bottom',
     'T-SHIRT': 'top',
-    'DRESS': 'body',   # Note: The current recommender might ignore dresses
+    'DRESS': 'body',  
 }
 
-# Define standard transforms
 transform = transforms.Compose([
     transforms.ToPILImage(),
     transforms.Resize((224, 224)),
@@ -37,10 +26,8 @@ def load_custom_model():
     """Loads the custom smart_closet_model.pth if available."""
     print("Loading Smart Closet Model...")
     
-    # Initialize ResNet18
     model = models.resnet18(pretrained=False)
     
-    # Adjust final layer for 4 classes
     num_ftrs = model.fc.in_features
     model.fc = torch.nn.Linear(num_ftrs, len(CLASSES))
     
@@ -61,10 +48,6 @@ def load_custom_model():
 
 model = load_custom_model()
 
-
-# ==========================================
-# 2. COLOR DETECTION (K-MEANS)
-# ==========================================
 
 def get_dominant_colors(image, n_colors=3):
     pixels = image.reshape(-1, 3).astype(float)
@@ -110,11 +93,6 @@ def get_color(image):
     colors = get_dominant_colors(image, n_colors=1)
     return colors[0]['name']
 
-
-# ==========================================
-# 3. PATTERN DETECTION
-# ==========================================
-
 def detect_pattern(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     std = np.std(gray)
@@ -131,10 +109,6 @@ def detect_pattern(image):
     elif std > 40: return "Textured"
     else: return "Plain"
 
-
-# ==========================================
-# 4. CATEGORY DETECTION (UPDATED)
-# ==========================================
 
 def classify_category_model(image):
     """Predict category using the custom trained model and map to App Category"""
@@ -186,18 +160,13 @@ def get_category(image, filename):
     if fname_cat != "unknown":
         return fname_cat
     
-    # 2. Custom Model
     model_cat = classify_category_model(image)
     if model_cat and model_cat != "unknown":
         return model_cat
 
-    # 3. CV Fallback (Catch-all for shoes if filename failed)
     return classify_category_cv(image)
 
 
-# ==========================================
-# 5. FEATURE EXTRACTION
-# ==========================================
 
 def extract_embedding(image):
     img = transform(image).unsqueeze(0)

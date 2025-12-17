@@ -4,7 +4,6 @@ import numpy as np
 from analyzer import analyze_item
 from recommender import recommend_outfit
 
-# Page configuration
 st.set_page_config(
     page_title="Smart Closet",
     page_icon="👔",
@@ -12,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -73,11 +71,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
 if 'page' not in st.session_state: st.session_state.page = 'wardrobe'
 if 'closet' not in st.session_state: st.session_state.closet = []
 
-# Sidebar
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">Smart Closet</div>', unsafe_allow_html=True)
     if st.button("👔  My Wardrobe", key="nav_wardrobe", use_container_width=True, type="primary" if st.session_state.page == 'wardrobe' else "secondary"):
@@ -93,7 +89,6 @@ with st.sidebar:
         st.session_state.page = 'stats'
         st.rerun()
 
-# --- PAGE: WARDROBE ---
 if st.session_state.page == 'wardrobe':
     col1, col2 = st.columns([3, 1])
     with col1: st.markdown('<div class="main-title">Welcome to Your Digital Wardrobe</div>', unsafe_allow_html=True)
@@ -105,7 +100,6 @@ if st.session_state.page == 'wardrobe':
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<div class="collection-header">My Current Collection</div>', unsafe_allow_html=True)
     
-    # Filter (Added 'Dresses')
     filter_option = st.selectbox("Filter", ["All Items", "Tops", "Bottoms", "Dresses", "Shoes"], label_visibility="collapsed")
     
     if len(st.session_state.closet) > 0:
@@ -132,7 +126,6 @@ if st.session_state.page == 'wardrobe':
     else:
         st.markdown("""<div style="text-align: center; padding: 4rem; background: white; border-radius: 20px; margin-top: 2rem;"><h2 style="color: #5B5B8D;">Your wardrobe is empty</h2><p style="color: #9B9BB8;">Start by uploading some items!</p></div>""", unsafe_allow_html=True)
 
-# --- PAGE: UPLOAD ---
 elif st.session_state.page == 'upload':
     st.markdown('<div class="main-title">Upload New Item</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
@@ -171,7 +164,6 @@ elif st.session_state.page == 'upload':
                 st.session_state.page = 'wardrobe'
                 st.rerun()
 
-# --- PAGE: STYLIST (UPDATED) ---
 elif st.session_state.page == 'stylist':
     st.markdown('<div class="main-title">AI Outfit Stylist</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
@@ -228,7 +220,6 @@ elif st.session_state.page == 'stylist':
     else:
         st.warning("⚠️ You need either (Top + Bottom + Shoe) OR (Dress + Shoe) to generate an outfit!")
 
-# --- PAGE: STATS ---
 elif st.session_state.page == 'stats':
     st.markdown('<div class="main-title">Wardrobe Statistics</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)

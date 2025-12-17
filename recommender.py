@@ -27,7 +27,6 @@ def calculate_color_harmony(color1, color2):
     else:
         return 0.6
 
-# PATTERN COMPATIBILITY
 def pattern_compatibility(pattern1, pattern2):
     """Check if patterns work well together"""
     busy_patterns = {'Striped', 'Patterned'}
@@ -41,7 +40,6 @@ def pattern_compatibility(pattern1, pattern2):
     
     return 0.7
 
-# MAIN SCORING FUNCTION
 def score(item1, item2):
     """Calculate compatibility score between two items"""
     # Visual similarity
@@ -50,7 +48,6 @@ def score(item1, item2):
         [item2["embedding"]]
     )[0][0]
     
-    # Color harmony
     color_score = calculate_color_harmony(
         item1["color"], 
         item2["color"]
@@ -62,7 +59,6 @@ def score(item1, item2):
         item2.get("pattern", "Plain")
     )
     
-    # Weighted combination
     final_score = (
         0.30 * visual_sim +
         0.40 * color_score +
@@ -72,38 +68,32 @@ def score(item1, item2):
     return final_score
 
 
-# RECOMMENDATION ENGINE (UPDATED FOR DRESSES)
 def recommend_outfit(items):
     """Find the best outfit combination (Either Top+Bottom+Shoe OR Dress+Shoe)"""
     tops = [i for i in items if i["category"] == "top"]
     bottoms = [i for i in items if i["category"] == "bottom"]
     shoes = [i for i in items if i["category"] == "shoe"]
-    bodies = [i for i in items if i["category"] == "body"] # Dresses/Jumpsuits
+    bodies = [i for i in items if i["category"] == "body"]
 
     best_outfit = None
     best_score = -1
 
-    # 1. Check Top + Bottom + Shoe Combinations
     for t in tops:
         for b in bottoms:
             for s in shoes:
-                # Calculate average compatibility of the trio
                 s1 = score(t, b)
                 s2 = score(b, s)
                 s3 = score(t, s)
-                total = (s1 + s2 + s3) / 3 # Average score
+                total = (s1 + s2 + s3) / 3 
                 
                 if total > best_score:
                     best_score = total
                     best_outfit = (t, b, s)
 
-    # 2. Check Dress + Shoe Combinations
     for d in bodies:
         for s in shoes:
-            # Calculate compatibility pair
             total = score(d, s)
             
-            # We give a slight bonus (1.05x) to dresses because they are easier to style
             if (total * 1.05) > best_score:
                 best_score = total
                 best_outfit = (d, s)

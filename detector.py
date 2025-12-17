@@ -2,7 +2,6 @@ import torch
 import cv2
 import os
 
-# Load YOLOv5 pretrained
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 
 def detect_clothes(image_path):
