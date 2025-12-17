@@ -1,10 +1,7 @@
-
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-# COLOR THEORY
 def calculate_color_harmony(color1, color2):
-    """Calculate how well two colors work together"""
     color_positions = {
         'Red': 0, 'Orange': 30, 'Yellow': 60, 'Green': 120,
         'Cyan': 180, 'Blue': 240, 'Purple': 280,
@@ -75,22 +72,40 @@ def score(item1, item2):
     return final_score
 
 
-# RECOMMENDATION ENGINE
+# RECOMMENDATION ENGINE (UPDATED FOR DRESSES)
 def recommend_outfit(items):
-    """Find the best outfit combination"""
+    """Find the best outfit combination (Either Top+Bottom+Shoe OR Dress+Shoe)"""
     tops = [i for i in items if i["category"] == "top"]
     bottoms = [i for i in items if i["category"] == "bottom"]
     shoes = [i for i in items if i["category"] == "shoe"]
+    bodies = [i for i in items if i["category"] == "body"] # Dresses/Jumpsuits
 
-    best = None
+    best_outfit = None
     best_score = -1
 
+    # 1. Check Top + Bottom + Shoe Combinations
     for t in tops:
         for b in bottoms:
             for s in shoes:
-                total = score(t, b) + score(b, s) + score(t, s)
+                # Calculate average compatibility of the trio
+                s1 = score(t, b)
+                s2 = score(b, s)
+                s3 = score(t, s)
+                total = (s1 + s2 + s3) / 3 # Average score
+                
                 if total > best_score:
                     best_score = total
-                    best = (t, b, s)
+                    best_outfit = (t, b, s)
 
-    return best
+    # 2. Check Dress + Shoe Combinations
+    for d in bodies:
+        for s in shoes:
+            # Calculate compatibility pair
+            total = score(d, s)
+            
+            # We give a slight bonus (1.05x) to dresses because they are easier to style
+            if (total * 1.05) > best_score:
+                best_score = total
+                best_outfit = (d, s)
+
+    return best_outfit
